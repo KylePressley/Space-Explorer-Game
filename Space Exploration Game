@@ -1,0 +1,59 @@
+import random
+
+class Planet:
+    def __init__(self, climate, resources, water, animals):
+        self.climate = climate
+        self.resources = resources
+        self.water = water
+        self.animals = animals
+
+class SolarSystem:
+    def __init__(self):
+        self.planets = [Planet(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)) for _ in range(random.randint(1, 20))]
+        self.current_planet_index = 0
+
+class Player:
+    def __init__(self):
+        self.resources = 0
+
+def generate_solar_system():
+    return SolarSystem()
+
+def explore_planet(player, solar_system):
+    current_planet = solar_system.planets[solar_system.current_planet_index]
+    print(f"Exploring planet {solar_system.current_planet_index + 1}")
+    print(f"Climate: {current_planet.climate}")
+    print(f"Resources: {current_planet.resources}")
+    print(f"Water: {current_planet.water}")
+    print(f"Animals: {current_planet.animals}")
+
+    harvest_amount = random.randint(1, current_planet.resources)
+    player.resources += harvest_amount
+    print(f"Harvested {harvest_amount} resources.")
+
+def move_to_next_planet(solar_system):
+    solar_system.current_planet_index += 1
+    if solar_system.current_planet_index >= len(solar_system.planets):
+        print("No more planets to explore in this solar system.")
+
+def main():
+    player = Player()
+    solar_system = generate_solar_system()
+
+    while True:
+        print("1. Explore current planet")
+        print("2. Move to next planet (risk of finding nothing)")
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            explore_planet(player, solar_system)
+        elif choice == "2":
+            move_to_next_planet(solar_system)
+
+        # Check if player has enough resources to build the engine
+        if player.resources >= 100:
+            print("Congratulations! You have enough resources to build a lightspeed engine.")
+            break
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,166 @@
+import tkinter as tk
+import random
+
+class Planet:
+    def __init__(self, climate, resources, water, animals, plants):
+        self.climate = climate
+        self.resources = resources
+        self.water = water
+        self.animals = animals
+        self.plants = plants
+
+class SolarSystem:
+    def __init__(self):
+        # Increased average resources and number of planets slightly to help balance the game
+        self.planets = [Planet(random.randint(1, 10), random.randint(10, 20), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)) for _ in range(random.randint(6, 12))]
+        self.current_planet_index = 0
+
+class Player:
+    def __init__(self):
+        self.resources = 0
+        self.materials = []
+        self.health = 100
+
+def generate_solar_system():
+    return SolarSystem()
+
+def harvest_resources(player, solar_system):
+    current_planet = solar_system.planets[solar_system.current_planet_index]
+    print(f"\nHarvesting resources from planet {solar_system.current_planet_index + 1}...")
+
+    # Show current planet's full attributes including updated resources
+    print(f"Climate: {current_planet.climate}")
+    print(f"Water: {current_planet.water}")
+    print(f"Animals: {current_planet.animals}")
+    print(f"Plants: {current_planet.plants}")
+    print(f"Resources: {current_planet.resources} (Depletes as you harvest)")
+
+    # Check if resources are available to harvest
+    if current_planet.resources > 0:
+        # Ensure the harvest amount is never higher than the remaining resources
+        harvest_amount = random.randint(1, min(5, current_planet.resources))
+        player.resources += harvest_amount
+        player.materials.append(f"{harvest_amount} of planet {solar_system.current_planet_index + 1} resources")
+        current_planet.resources -= harvest_amount  # Deplete the planet's resources
+        print(f"Harvested {harvest_amount} resources. Remaining resources: {current_planet.resources}.")
+        print(f"Total resources collected: {player.resources}.")
+    else:
+        print("This planet has no more resources to harvest.")
+
+    # Further reduce the health decrease to make the game easier
+    health_decrease = max(1, (10 - current_planet.climate) // 6 + (10 - current_planet.water) // 6 + 
+                        (10 - current_planet.animals) // 6 + (10 - current_planet.plants) // 6)
+    player.health -= health_decrease
+    print(f"Health decreased by {health_decrease}. Current health: {player.health}")
+
+def move_to_next_planet(player, solar_system):
+    solar_system.current_planet_index += 1
+    # Check if there are more planets to explore
+    if solar_system.current_planet_index >= len(solar_system.planets):
+        print("No more planets to explore in this solar system.")
+        solar_system.current_planet_index = len(solar_system.planets) - 1  # Reset index to the last planet
+    else:
+        # Decrease health for traveling to another planet
+        travel_cost = random.randint(1, 2)
+        player.health -= travel_cost
+        print(f"\nTraveled to the next planet. Health decreased by {travel_cost}. Current health: {player.health}")
+        
+        # Automatically harvest resources from the new planet
+        harvest_resources(player, solar_system)
+
+def display_inventory(player):
+    print("\nInventory:")
+    if player.materials:
+        for material in player.materials:
+            print(f"  {material}")
+    else:
+        print("  No materials collected yet.")
+    print(f"Current Health: {player.health}")
+    print(f"Total Resources: {player.resources}")
+
+def play_game():
+    # Print the introductory story
+    print("""
+    A distant hum vibrates through the ship, followed by a jolt that sends you tumbling forward. Your eyes snap open, and you find yourself staring at the blinking red lights of the ship's emergency systems. A quick scan of the console reveals the devastating news: your star jump booster has malfunctioned. You're stranded, light-years from home, in an unknown solar system.
+
+    Your heart pounds in your chest. The thought of being stranded, alone and helpless, sends a shiver down your spine. You glance at the medical scanner, which shows your health levels are critically low. The malfunction has taxed your life support systems, leaving you vulnerable to the harsh conditions of this alien world.
+
+    Your family, back on Earth, is waiting for you. They have no idea where you are or what has happened. You must find a way to jump back at lightspeed, even if it means risking everything. The fate of your mission, and perhaps your life, now rests in your hands.
+    """)
+
+    player = Player()
+    solar_system = generate_solar_system()
+
+    # Create the Tkinter UI
+    root = tk.Tk()
+    root.title("Space Exploration")
+
+    # Solar System Map
+    planet_list = tk.Listbox(root)
+    for i, planet in enumerate(solar_system.planets):
+        planet_list.insert(i, f"Planet {i + 1}")
+    planet_list.pack()
+
+    # Planet Information
+    planet_info_label = tk.Label(root, text="Current Planet:")
+    planet_info_label.pack()
+    planet_info_text = tk.Text(root, height=5, width=30)
+    planet_info_text.pack()
+
+    # Player Stats
+    player_stats_label = tk.Label(root, text="Player Stats:")
+    player_stats_label.pack()
+    player_stats_text = tk.Text(root, height=5, width=30)
+    player_stats_text.pack()
+
+    # Action Buttons
+    harvest_button = tk.Button(root, text="Harvest", command=lambda: harvest_resources(player, solar_system))
+    harvest_button.pack()
+    move_button = tk.Button(root, text="Move", command=lambda: move_to_next_planet(player, solar_system))
+    move_button.pack()
+    inventory_button = tk.Button(root, text="Inventory", command=lambda: display_inventory(player))
+    inventory_button.pack()
+
+    # Update UI functions
+    def update_ui():
+        planet_info_text.delete(1.0, tk.END)
+        planet_info_text.insert(tk.END, f"Climate: {current_planet.climate}\n"
+                                       f"Water: {current_planet.water}\n"
+                                       f"Animals: {current_planet.animals}\n"
+                                       f"Plants: {current_planet.plants}\n"
+                                       f"Resources: {current_planet.resources}")
+
+        player_stats_text.delete(1.0, tk.END)
+        player_stats_text.insert(tk.END, f"Health: {player.health}\n"
+                                        f"Resources: {player.resources}\n")
+
+        planet_list.selection_set(solar_system.current_planet_index)
+        root.after(100, update_ui)
+
+    # Main game loop
+    while True:
+        update_ui()
+        root.update()
+
+        # Game logic
+        if player.resources >= 100:
+            print("\nCongratulations! You have enough resources to build a lightspeed engine. You engage your hyperdrive thrusters and blast off back to Earth!")
+            break
+        elif player.health <= 0:
+            print("\nGame over! Your health has reached zero.")
+            break
+        elif solar_system.current_planet_index == len(solar_system.planets) - 1 and solar_system.planets[solar_system.current_planet_index].resources == 0:
+            print("""
+            Oops! You ran out of planets and resources before building your booster. Turns out, you forgot to check 
+            the fuel gauge—just like that time you got stuck on the highway with an empty tank! Now you're drifting 
+            in space, wondering how a spaceship doesn't have a "low fuel" light.
+            """)
+            break
+
+    # After the game ends, keep the UI window open
+    root.mainloop()
+
+if __name__ == "__main__":
+    play_game()
+    create_ui()
+    root.mainloop()

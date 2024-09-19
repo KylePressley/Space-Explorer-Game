@@ -1,0 +1,59 @@
+import random
+
+class Planet:
+  def __init__(self, climate, resources, water, animals, plants):
+    self.climate = climate
+    self.resources = resources
+    self.water = water
+    self.animals = animals
+    self.plants = plants
+
+class SolarSystem:
+  def __init__(self):
+    self.planets = [Planet(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)) for _ in range(random.randint(1, 20))]
+    self.current_planet_index = 0
+
+class Player:
+  def __init__(self):
+    self.resources = 0
+    self.materials = []
+    self.health = 100
+
+def generate_solar_system():
+  return SolarSystem()
+
+def explore_planet(player, solar_system):
+  # ... rest of the explore_planet function
+  # ...
+
+def move_to_next_planet(solar_system):
+  # ... rest of the move_to_next_planet function
+  # ...
+
+def main():
+  # ... rest of the main function
+
+  while True:
+    # ... rest of the while loop
+
+    # Check if player has won or lost
+    if player.resources >= 100:
+      print("Congratulations! You have enough resources to build a lightspeed engine.")
+      break
+    elif player.health <= 0:
+      print("Game over! Your health has reached zero.")
+      break
+
+  # Offer to play again after winning or losing
+  if player.resources >= 100 or player.health <= 0:
+    print("Would you like to play again? (yes/no)")
+    if input().lower() == "yes":
+      # Reset resources, materials, health, and planet index
+      player.resources = 0
+      player.materials = []
+      player.health = 100
+      solar_system.current_planet_index = 0
+      print("Starting a new adventure...")
+      continue
+    else:
+      break

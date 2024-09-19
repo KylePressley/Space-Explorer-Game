@@ -1,0 +1,91 @@
+import random
+
+class Planet:
+    def __init__(self, climate, resources, water, animals, plants):
+        self.climate = climate
+        self.resources = resources
+        self.water = water
+        self.animals = animals
+        self.plants = plants
+
+class SolarSystem:
+    def __init__(self):
+        self.planets = [Planet(random.randint(1, 10), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10)) for _ in range(random.randint(1, 20))]
+        self.current_planet_index = 0
+
+class Player:
+    def __init__(self):
+        self.resources = 0
+        self.materials = []
+        self.health = 100
+
+def generate_solar_system():
+    return SolarSystem()
+
+def explore_planet(player, solar_system):
+    current_planet = solar_system.planets[solar_system.current_planet_index]
+    print(f"Exploring planet {solar_system.current_planet_index + 1}")
+    print(f"Climate: {current_planet.climate}")
+    print(f"Resources: {current_planet.resources}")
+    print(f"Water: {current_planet.water}")
+    print(f"Animals: {current_planet.animals}")
+    print(f"Plants: {current_planet.plants}")
+
+    harvest_amount = random.randint(1, current_planet.resources)
+    player.resources += harvest_amount
+    player.materials.append(f"{harvest_amount} of planet {solar_system.current_planet_index + 1} resources")
+    print(f"Harvested {harvest_amount} resources.")
+
+    # Calculate health decrease based on planet conditions
+    health_decrease = (10 - current_planet.climate) + (10 - current_planet.water) + (10 - current_planet.animals) + (10 - current_planet.plants)
+    player.health -= health_decrease
+    print(f"Health decreased by {health_decrease}. Current health: {player.health}")
+
+    # Display updated resources and health
+    print(f"Resources: {player.resources}")
+    print(f"Health: {player.health}")
+
+def move_to_next_planet(solar_system):
+    solar_system.current_planet_index += 1
+    if solar_system.current_planet_index >= len(solar_system.planets):
+        print("No more planets to explore in this solar system.")
+
+def main():
+    # Print the introductory story
+    print("""
+    A distant hum vibrates through the ship, followed by a jolt that sends you tumbling forward. Your eyes snap open, and you find yourself staring at the blinking red lights of the ship's emergency systems. A quick scan of the console reveals the devastating news: your star jump booster has malfunctioned. You're stranded, light-years from home, in an unknown solar system.
+
+    Your heart pounds in your chest. The thought of being stranded, alone and helpless, sends a shiver down your spine. You glance at the medical scanner, which shows your health levels are critically low. The malfunction has taxed your life support systems, leaving you vulnerable to the harsh conditions of this alien world.
+
+    Your family, back on Earth, is waiting for you. They have no idea where you are or what has happened. You must find a way to jump back at lightspeed, even if it means risking everything. The fate of your mission, and perhaps your life, now rests in your hands.
+    """)
+
+    player = Player()
+    solar_system = generate_solar_system()
+
+    while True:
+        print("1. Explore current planet")
+        print("2. Move to next planet (risk of finding nothing)")
+        print("3. Check inventory and health")
+        choice = input("Choose an action: ")
+
+        if choice == "1":
+            explore_planet(player, solar_system)
+        elif choice == "2":
+            move_to_next_planet(solar_system)
+        elif choice == "3":
+            print("Resources:")
+            for material in player.materials:
+                print(f"  {material}")
+            print(f"Health: {player.health}")
+
+        # Check if player has enough resources to build the engine or if health is depleted
+        if player.resources >= 100:
+            print("Congratulations! You have enough resources to build a lightspeed engine.")
+            break
+        if player.health <= 0:
+            print("Game over! Your health has reached zero.")
+            break
+
+if __name__ == "__main__":
+    main()
